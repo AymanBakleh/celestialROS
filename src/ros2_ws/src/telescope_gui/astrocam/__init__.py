@@ -1,0 +1,1 @@
+"""AstroCam package."""
