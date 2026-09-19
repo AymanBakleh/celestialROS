@@ -1,0 +1,31 @@
+# Telescope control parameters
+
+# Operation mode: "simulation", "hardware", or "hybrid"
+mode: "simulation"
+
+# Mount parameters
+mount:
+  max_speed: 8.0      # Maximum angular speed (degrees/second)
+  max_accel: 2.0      # Maximum angular acceleration (degrees/second^2)
+
+# Location (for coordinate transformations and Stellarium)
+location:
+  lat: 37.7749        # Latitude in degrees (default: San Francisco)
+  lon: -122.4194      # Longitude in degrees (default: San Francisco)
+
+# Stellarium connection parameters
+stellarium:
+  remote_control:
+    host: "localhost"
+    port: 8090          # Stellarium Remote Control plugin port (for receiving targets)
+  telescope_control:
+    host: "localhost"
+    port: 10001         # Stellarium Telescope Control plugin port (for sending position)
+  coordinate_system: "J2000"  # J2000 or JNow (equinox of date) - must match Stellarium config
+  connection_delay: 0.5  # Connection delay in seconds (matches Stellarium config)
+
+# Hardware driver parameters (for future use in hardware/hybrid modes)
+hardware:
+  serial_port: "/dev/ttyUSB0"
+  baud_rate: 9600
+  timeout: 1.0

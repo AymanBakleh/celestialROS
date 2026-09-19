@@ -1,0 +1,30 @@
+# Telescope control parameters
+
+/**:
+  ros__parameters:
+    # Operation mode: "simulation", "hardware", or "hybrid"
+    mode: "simulation"
+
+    # Mount parameters
+    mount:
+      max_speed: 8.0      # Maximum angular speed (degrees/second)
+      max_accel: 2.0      # Maximum angular acceleration (degrees/second^2)
+
+    # Location (for coordinate transformations and Stellarium)
+    location:
+      lat: 33.5138        # Latitude in degrees (Damascus)
+      lon: 36.2765        # Longitude in degrees (Damascus)
+
+    # Stellarium connection parameters
+    stellarium:
+      host: "localhost"
+      port: 8090          # Stellarium Remote Control plugin port
+
+# Joint states topic used for coordinate transformer
+joint_states_topic: '/joint_states_merged'
+
+# Hardware driver parameters (for future use in hardware/hybrid modes)
+hardware:
+  serial_port: "/dev/ttyUSB0"
+  baud_rate: 9600
+  timeout: 1.0

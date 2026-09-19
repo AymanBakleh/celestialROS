@@ -1,0 +1,60 @@
+# RTC Usage Example - Fixed 3 PM Issue
+
+## Root Cause of 3 PM Problem:
+The issue was that `rtc_update_local_time()` was adding 3 hours to the RTC time, 
+assuming the RTC stored UTC time. But your RTC was already storing local time, 
+so adding 3 more hours pushed it to 3 PM (15:00).
+
+## Fix Applied:
+✅ Removed the UTC+3 conversion in `rtc_update_local_time()`
+✅ Added debug output to see what RTC actually returns
+✅ RTC time is now used directly as local time
+
+## Debug Output:
+When you sync with RTC, you'll now see:
+```
+RTC DEBUG: Read 2026-03-25 14:30:00
+RTC DEBUG: Set local time to 14:30:00
+```
+
+## Commands to Use RTC:
+
+### 1. Check RTC Status:
+```json
+{"T":18, "rtc_available":true}
+```
+
+### 2. Sync Time from RTC (with debug):
+```json
+{"T":18, "rtc_get_time":true}
+```
+Now shows debug output of what RTC actually contains
+
+### 3. Set RTC Time:
+```json
+{"T":18, "rtc_set_time":true, "year":2026, "month":3, "day":25, "hour":14, "minute":30, "second":0}
+```
+
+### 4. Set Date for LST Calculations:
+```json
+{"T":18, "set_date":true, "year":2026, "month":3, "day":25}
+```
+
+### 5. Set Time Mode:
+```json
+{"T":18, "time_mode":2}
+```
+
+## Expected Behavior Now:
+- **RTC Sync**: Reads exact time from RTC without adding 3 hours
+- **No More 3 PM**: Time should match what's actually stored in RTC
+- **Debug Info**: Serial monitor shows what RTC is returning
+- **LST Calculations**: Still properly convert to UTC for astronomical calculations
+
+## Test Steps:
+1. Set RTC to a known time (e.g., 10:30:00)
+2. Send: `{"T":18, "rtc_get_time":true}`
+3. Check debug output - should show exactly 10:30:00
+4. Local time should now be 10:30:00, not 13:30:00 (3 PM)
+
+The 3 PM issue should now be completely resolved!

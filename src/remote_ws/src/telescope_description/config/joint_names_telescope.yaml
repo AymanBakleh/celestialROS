@@ -1,0 +1,1 @@
+controller_joint_names: ['polar_align_joint', 'ra_joint', 'dec_joint' ]

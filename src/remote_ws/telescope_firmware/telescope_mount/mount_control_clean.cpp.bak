@@ -1,0 +1,34 @@
+#include "mount_control.h"
+#include "config.h"
+#include "servo_control.h"
+#include <ArduinoJson.h>
+
+// ============ GLOBALS ============
+int16_t last_ra_pos_speed = 0;
+int16_t last_dec_pos_speed = 0;
+unsigned long last_speed_update = 0;
+// last commanded or measured servo speed (library units)
+float ra_speed = 0.0f;
+float dec_speed = 0.0f;
+
+int32_t ra_zero_steps = 0;
+int32_t dec_zero_steps = 0;
+
+bool torque_enabled = false;
+bool ros_started = false;
+
+// Follow mode variables
+bool follow_mode = false;
+float follow_ra_speed = 0.0f;
+
+// Hardware constants are now defined as macros in config.h
+
+float target_ra_rad = 0.0f;
+float target_dec_rad = 0.0f;
+int32_t current_ra_steps = 0;
+int32_t current_dec_steps = 0;
+int16_t last_ra_pos = 0;
+int16_t last_dec_pos = 0;
+
+float ra_ratio = DEFAULT_RA_RATIO;
+float dec_ratio = DEFAULT_DEC_RATIO;

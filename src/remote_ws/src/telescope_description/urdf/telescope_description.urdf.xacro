@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="telescope_description" xmlns:xacro="http://www.ros.org/wiki/xacro">
+	<link name="world"/>
+
+	<link name="base_link">
+		<inertial>
+			<origin xyz="-0.684 0.42 1.201" rpy="3.14159 0 0"/>
+			<mass value="1.0"/>
+			<inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+		</inertial>
+		<visual>
+			<origin xyz="-0.684 0.42 1.201" rpy="3.14159 0 0"/>
+			<geometry>
+				<mesh filename="package://telescope_description/meshes/mount_base.STL" scale="0.001 0.001 0.001"/>
+			</geometry>
+			<material name="base_material">
+				<color rgba="0.8 0.8 0.8 1.0"/>
+			</material>
+		</visual>
+		<collision>
+			<origin xyz="-0.684 0.42 1.201" rpy="3.14159 0 0"/>
+			<geometry>
+				<mesh filename="package://telescope_description/meshes/mount_base.STL" scale="0.001 0.001 0.001"/>
+			</geometry>
+		</collision>
+	</link>
+
+	<joint name="fixed_link" type="fixed">
+		<parent link="world"/>
+		<child link="base_link"/>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+	</joint>
+
+
+	<link name="polar_align_link">
+		<inertial>
+			<origin xyz="0.015 -0.039 -0.014" rpy="0 0 1.570795"/>
+			<mass value="0.5"/>
+			<inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+		</inertial>
+		<visual>
+			<origin xyz="0.015 -0.039 -0.014" rpy="0 0 1.570795"/>
+			<geometry>
+				<mesh filename="package://telescope_description/meshes/mount_link_1.STL" scale="0.001 0.001 0.001"/>
+			</geometry>
+			<material name="mount_material">
+				<color rgba="0.5 0.5 0.5 1.0"/>
+			</material>
+		</visual>
+		<collision>
+			<origin xyz="0.015 -0.039 -0.014" rpy="0 0 1.570795"/>
+			<geometry>
+				<mesh filename="package://telescope_description/meshes/mount_link_1.STL" scale="0.001 0.001 0.001"/>
+			</geometry>
+		</collision>
+	</link>
+
+	<joint name="polar_align_joint" type="revolute">
+		<parent link="base_link"/>
+		<child link="polar_align_link"/>
+		<origin xyz="0 0 1.17" rpy="0 0 0"/>
+		<axis xyz="0 1 0"/>
+		<limit lower="0" upper="1.570795" effort="1000.0" velocity="0.1"/>
+	</joint>
+
+	<xacro:property name="polar_align_default" value="0.584913" /> <!-- 33.5102 degrees -->
+
+
+	<link name="ra_link">
+		<inertial>
+			<origin xyz="0.043 0.04 0.11" rpy="0 3.14159 1.570795"/>
+			<mass value="0.5"/>
+			<inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+		</inertial>
+		<visual>
+			<origin xyz="0.043 0.04 0.11" rpy="0 3.14159 1.570795"/>
+			<geometry>
+				<mesh filename="package://telescope_description/meshes/mount_link_2.STL" scale="0.001 0.001 0.001"/>
+			</geometry>
+			<material name="mount_material">
+				<color rgba="1 0.5 0.5 1.0"/>
+			</material>
+		</visual>
+		<collision>
+			<origin xyz="0.043 0.04 0.11" rpy="0 3.14159 1.570795"/>
+			<geometry>
+				<mesh filename="package://telescope_description/meshes/mount_link_2.STL" scale="0.001 0.001 0.001"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="ra_joint" type="revolute">
+		<parent link="polar_align_link"/>
+		<child link="ra_link"/>
+		<origin xyz="-0.1 0.01 0.115" rpy="0 0 4.71239"/>
+		<axis xyz="0 0 1"/>
+		<limit lower="-1.570795" upper="1.570795" effort="1000.0" velocity="0.1"/>
+	</joint>
+
+
+
+	<xacro:property name="ra_default" value="0" /> <!-- 0 degrees, continuous rotation -->
+
+
+	<link name="dec_link">
+		<inertial>
+			<origin xyz="0.081 -0.22 -0.358" rpy="0 0 1.570795"/>
+			<mass value="0.5"/>
+			<inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+		</inertial>
+		<visual>
+			<origin xyz="0.081 -0.22 -0.358" rpy="0 0 1.570795"/>
+			<geometry>
+				<mesh filename="package://telescope_description/meshes/telescope_tube.STL" scale="0.001 0.001 0.001"/>
+			</geometry>
+			<material name="mount_material">
+				<color rgba="0.5 0.5 1 1.0"/>
+			</material>
+		</visual>
+		<collision>
+			<origin xyz="0.081 -0.22 -0.358" rpy="0 0 1.570795"/>
+			<geometry>
+				<mesh filename="package://telescope_description/meshes/telescope_tube.STL" scale="0.001 0.001 0.001"/>
+			</geometry>
+		</collision>
+	</link>
+
+
+	<joint name="dec_joint" type="revolute">
+		<parent link="ra_link"/>
+		<child link="dec_link"/>
+		<origin xyz="0.005 -0.135 0.069" rpy="0 0 0"/>
+		<axis xyz="0 -1 0"/>
+		<!-- Mechanical DEC travel uses 0..360 deg with midpoint at 180 deg. -->
+		<limit lower="0.0" upper="6.283185" effort="1000.0" velocity="0.1"/>
+	</joint>
+
+	<xacro:property name="dec_default" value="3.141592" /> <!-- 180 degrees (mechanical center) -->
+</robot>

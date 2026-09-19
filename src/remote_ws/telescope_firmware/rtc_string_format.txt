@@ -1,0 +1,101 @@
+# RTC String Format Guide - YYMMDDWhhmmss
+
+## New Format Added:
+✅ **YYMMDDWhhmmss** - Exact format from your examples
+- YY: Year (2 digits, e.g., 26 = 2026)
+- MM: Month (2 digits, 01-12)
+- DD: Day (2 digits, 01-31)
+- W: Day of week (1 digit, 1=Monday, 7=Sunday)
+- hh: Hour (2 digits, 00-23)
+- mm: Minute (2 digits, 00-59)
+- ss: Second (2 digits, 00-59)
+
+## Usage Commands:
+
+### 1. Set RTC with String Format:
+```json
+{"T":18, "rtc_set_string":true, "time_string":"2603253143000"}
+```
+Example: Sets March 25, 2026, Wednesday, 14:30:00
+
+### 2. Set RTC with Individual Fields (still available):
+```json
+{"T":18, "rtc_set_time":true, "year":2026, "month":3, "day":25, "hour":14, "minute":30, "second":0}
+```
+
+### 3. Test RTC Hardware:
+```json
+{"T":18, "rtc_test":true}
+```
+
+### 4. Read from RTC:
+```json
+{"T":18, "rtc_get_time":true}
+```
+
+## Format Examples:
+
+| Date | Time | DOW | String Format | Result |
+|------|-------|-----|--------------|--------|
+| 2026-03-25 | 14:30:00 | Wed (3) | "2603253143000" |
+| 2026-12-31 | 23:59:59 | Thu (4) | "2612314235959" |
+| 2026-01-01 | 00:00:00 | Fri (5) | "2601015150000" |
+
+## Day of Week Values:
+- 1 = Monday
+- 2 = Tuesday  
+- 3 = Wednesday
+- 4 = Thursday
+- 5 = Friday
+- 6 = Saturday
+- 7 = Sunday
+
+## Debug Output:
+
+When using string format, you'll see:
+```
+RTC DEBUG: Parsed 2603253143000 -> 2026-03-25 14:30:00 (DOW:3)
+RTC DEBUG: Writing to RTC - 2026-03-25 14:30:00 (DOW:3)
+RTC DEBUG: DateTime struct - year:26, month:3, day:25, hour:14, minute:30, second:0, dow:3
+RTC DEBUG: Read back - 2026-03-25 14:30:00 (DOW:3)
+RTC: Time set to 2026-03-25 14:30:00 (DOW:3)
+```
+
+## Web GUI Integration:
+
+For web interface, add this input field:
+```html
+<input type="text" id="rtc_time_string" placeholder="YYMMDDWhhmmss" maxlength="13" pattern="\d{13}">
+<button onclick="setRtcString()">Set RTC Time</button>
+
+<script>
+function setRtcString() {
+    const timeStr = document.getElementById('rtc_time_string').value;
+    sendCommand('{"T":18, "rtc_set_string":true, "time_string":"' + timeStr + '"}');
+}
+</script>
+```
+
+## Validation:
+The code automatically validates:
+- ✅ String length must be exactly 13 characters
+- ✅ All characters must be digits
+- ✅ Month range: 01-12
+- ✅ Day range: 01-31  
+- ✅ Hour range: 00-23
+- ✅ Minute range: 00-59
+- ✅ Second range: 00-59
+- ✅ DOW range: 01-07
+
+## Error Messages:
+- `RTC ERROR: Invalid time format. Expected YYMMDDWhhmmss (13 chars), got X chars`
+- `RTC DEBUG: Cannot set time - RTC not available`
+
+## Benefits:
+- ✅ Exact match to your provided examples
+- ✅ Compact 13-character format
+- ✅ Includes day-of-week in single digit
+- ✅ Easy for manual entry and web forms
+- ✅ Automatic validation and debug output
+
+Now you can set RTC time using the exact format from your examples!

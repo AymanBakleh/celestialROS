@@ -1,0 +1,94 @@
+# RTC Fixed Usage - Based on Official Examples
+
+## Issues Fixed:
+✅ **Day of Week**: Now correctly uses DS1302 format (1=Monday, 7=Sunday)
+✅ **RTC Reading**: Returns default values when RTC unavailable instead of nothing
+✅ **Time Setting**: Proper day-of-week calculation using Zeller's congruence
+✅ **Sync Commands**: Added proper time sync commands
+
+## Day of Week Mapping:
+- DS1302 format: 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday, 7=Sunday
+- Zeller's calculation: 0=Sunday, 1=Monday, 2=Tuesday, ..., 6=Saturday
+- Code automatically converts between formats
+
+## Working Commands:
+
+### 1. Set RTC Time (with automatic day-of-week):
+```json
+{"T":18, "rtc_set_time":true, "year":2026, "month":3, "day":25, "hour":14, "minute":30, "second":0}
+```
+- Automatically calculates correct day-of-week
+- Sets RTC and updates LST date
+- Debug output shows: `RTC: Time set to 2026-03-25 14:30:00 (DOW:3)`
+
+### 2. Read RTC Time:
+```json
+{"T":18, "rtc_get_time":true}
+```
+- Reads from RTC and updates local time
+- Debug shows what RTC actually contains
+- If RTC unavailable, sets default 12:00:00
+
+### 3. Sync Time from RTC:
+```json
+{"T":18, "sync_time":true, "from_rtc":true}
+```
+- Alternative way to sync from RTC
+- Same as rtc_get_time but clearer naming
+
+### 4. Set Local Time Directly:
+```json
+{"T":18, "sync_time":true, "hour":14, "minute":30, "second":0}
+```
+- Sets local time without touching RTC
+- Useful for manual time setting
+
+### 5. Set Date for LST:
+```json
+{"T":18, "set_date":true, "year":2026, "month":3, "day":25}
+```
+
+## Test Scenarios:
+
+### Test 1: RTC Working
+1. Set RTC to known time: `{"T":18, "rtc_set_time":true, "year":2026, "month":3, "day":25, "hour":10, "minute":15, "second":30}`
+2. Read back: `{"T":18, "rtc_get_time":true}`
+3. Should show: `RTC DEBUG: Read 2026-03-25 10:15:30` and `RTC DEBUG: Set local time to 10:15:30`
+
+### Test 2: RTC Not Available
+1. Disconnect RTC or power it off
+2. Send: `{"T":18, "rtc_get_time":true}`
+3. Should show: `RTC DEBUG: RTC not available, set default time 12:00:00`
+4. Local time should be 12:00:00, not 00:00:00
+
+### Test 3: Day of Week Calculation
+1. Set March 25, 2026 (Wednesday): `{"T":18, "rtc_set_time":true, "year":2026, "month":3, "day":25, "hour":12, "minute":0, "second":0}`
+2. Debug should show: `RTC: Time set to 2026-03-25 12:00:00 (DOW:3)`
+3. DOW=3 means Wednesday (correct)
+
+## Debug Output Examples:
+
+### Working RTC:
+```
+RTC DEBUG: Read 2026-03-25 14:30:00
+RTC DEBUG: Set local time to 14:30:00
+```
+
+### RTC Not Available:
+```
+RTC DEBUG: RTC not available, set default time 12:00:00
+```
+
+### Setting Time:
+```
+RTC: Time set to 2026-03-25 14:30:00 (DOW:3)
+```
+
+## Important Notes:
+- RTC stores LOCAL time, not UTC
+- Day-of-week is calculated automatically
+- Default time when RTC unavailable: 12:00:00 (not 00:00:00)
+- Default date: March 25, 2026
+- T13 is for RA/DEC sync, not time sync
+
+The RTC should now work exactly like the official examples!

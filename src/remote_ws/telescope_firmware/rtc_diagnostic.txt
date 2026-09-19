@@ -1,0 +1,98 @@
+# RTC Diagnostic Guide - Fixing 2000-00-00 00:00:00 Issue
+
+## Problem Analysis:
+Your RTC is returning `2000-00-00 00:00:00` which indicates:
+- RTC communication is working (it's not completely dead)
+- But the RTC data is invalid/empty
+- This usually happens when RTC loses power or has corrupted data
+
+## Step 1: Run Hardware Test
+Send this command to test the RTC hardware:
+```json
+{"T":18, "rtc_test":true}
+```
+
+Expected output should show:
+```
+=== RTC Hardware Test ===
+RTC Halted: NO/YES
+RTC Raw Read: year=?, month=?, day=?, hour=?, minute=?, second=?, dow=?
+RTC: Writing test time 2026-03-25 14:30:00
+RTC Verify Read: year=?, month=?, day=?, hour=?, minute=?, second=?, dow=?
+RTC: ✓ Write/Read test PASSED/FAILED
+=== End RTC Test ===
+```
+
+## Step 2: Try Setting Time with Debug
+Set a specific time and watch the debug output:
+```json
+{"T":18, "rtc_set_time":true, "year":2026, "month":3, "day":25, "hour":14, "minute":30, "second":0}
+```
+
+Expected debug output:
+```
+RTC DEBUG: Writing to RTC - 2026-03-25 14:30:00 (DOW:3)
+RTC DEBUG: DateTime struct - year:26, month:3, day:25, hour:14, minute:30, second:0, dow:3
+RTC DEBUG: Read back - 2026-03-25 14:30:00 (DOW:3)
+RTC: Time set to 2026-03-25 14:30:00 (DOW:3)
+```
+
+## Step 3: Verify Read
+Immediately after setting, try to read it back:
+```json
+{"T":18, "rtc_get_time":true}
+```
+
+Expected:
+```
+RTC DEBUG: Read 2026-03-25 14:30:00
+RTC DEBUG: Set local time to 14:30:00
+```
+
+## Possible Issues & Solutions:
+
+### Issue 1: RTC Battery Dead
+**Symptoms**: RTC keeps resetting to 2000-00-00 after power cycle
+**Solution**: Replace CR2032 battery
+
+### Issue 2: Bad Connections 
+**Symptoms**: Read/Write test fails, random garbage data
+**Check**: 
+- Pin 25 (CE) connected to RTC CE/RST
+- Pin 26 (IO) connected to RTC I/O  
+- Pin 27 (SCLK) connected to RTC SCLK
+- 3.3V and GND properly connected
+
+### Issue 3: RTC Halted
+**Symptoms**: RTC reports halted but can be revived
+**Solution**: The code should automatically un-halt it in rtc_init()
+
+### Issue 4: Corrupted Memory
+**Symptoms**: RTC accepts writes but reads back garbage
+**Solution**: Try power cycling the RTC with fresh battery
+
+## Test Results Interpretation:
+
+### ✅ GOOD: Write/Read Test PASSED
+- RTC hardware is working
+- Issue was probably corrupted data
+- Should work normally now
+
+### ❌ BAD: Write/Read Test FAILED  
+- RTC hardware has problems
+- Check connections and battery
+- May need replacement RTC chip
+
+### ❌ BAD: RTC Halted: YES
+- RTC is in halted state
+- Code should automatically un-halt it
+- If still halted after restart, check battery
+
+## Next Steps:
+1. Run the hardware test first
+2. Based on results, either:
+   - ✅ If test passes: Try normal time setting
+   - ❌ If test fails: Check hardware connections/battery
+3. Share the test output here for further diagnosis
+
+The debug output will tell us exactly what's happening with the RTC communication!

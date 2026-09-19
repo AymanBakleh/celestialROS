@@ -1,0 +1,97 @@
+# RTC Troubleshooting - Stuck at 2000-00-00 00:00:00
+
+## Problem: RTC returning invalid data despite being "available"
+
+## Immediate Test to Run:
+Send this command to diagnose the hardware:
+```json
+{"T":18, "rtc_test":true}
+```
+
+## What to Look For:
+
+### ✅ GOOD - Write/Read Test PASSES:
+```
+=== RTC Hardware Test ===
+RTC Halted: NO
+RTC Raw Read: year=0, month=0, day=0, hour=0, minute=0, second=0, dow=0
+RTC: Writing test time 2026-03-25 14:30:00
+RTC Verify Read: year=26, month=3, day=25, hour=14, minute=30, second:0, dow=3
+RTC: ✓ Write/Read test PASSED
+=== End RTC Test ===
+```
+**Meaning**: RTC hardware works, just has corrupted data. Should work after setting time.
+
+### ❌ BAD - Write/Read Test FAILS:
+```
+=== RTC Hardware Test ===
+RTC Halted: NO
+RTC Raw Read: year=0, month=0, day=0, hour=0, minute=0, second=0, dow=0
+RTC: Writing test time 2026-03-25 14:30:00
+RTC Verify Read: year=0, month=0, day=0, hour=0, minute=0, second:0, dow=0
+RTC: ✗ Write/Read test FAILED
+=== End RTC Test ===
+```
+**Meaning**: RTC hardware has serious problems.
+
+## Most Likely Causes:
+
+### 1. Dead Battery (90% probability)
+- CR2032 battery is dead
+- RTC loses all data when power off
+- Replace battery and try again
+
+### 2. Bad Connections (8% probability)
+Check these connections:
+- Pin 25 (CE) → RTC CE/RST pin
+- Pin 26 (IO) → RTC I/O pin  
+- Pin 27 (SCLK) → RTC SCLK pin
+- 3.3V → RTC VCC
+- GND → RTC GND
+
+### 3. Defective RTC Chip (2% probability)
+- DS1302 chip is damaged
+- Needs replacement
+
+## Step-by-Step Fix:
+
+### Step 1: Run Hardware Test
+```json
+{"T":18, "rtc_test":true}
+```
+
+### Step 2: If Test PASSES - Set Time
+```json
+{"T":18, "rtc_set_string":true, "time_string":"2603253143000"}
+```
+
+### Step 3: Verify
+```json
+{"T":18, "rtc_get_time":true}
+```
+
+### Step 4: If Test FAILS - Check Hardware
+1. Replace CR2032 battery
+2. Verify all 5 connections
+3. Try again
+
+## Expected Results After Fix:
+
+### Working RTC:
+```
+RTC DEBUG: Read 2026-03-25 14:30:00
+RTC DEBUG: Set local time to 14:30:00
+```
+
+### Still Broken:
+```
+RTC DEBUG: Read 2000-00-00 00:00:00
+RTC DEBUG: Set local time to 00:00:00
+```
+
+## Quick Battery Check:
+- Measure battery voltage: Should be ~3.0V
+- If <2.5V, battery is dead
+- Replace with new CR2032
+
+The fact that RTC reports "running" but returns all zeros strongly suggests dead battery or corrupted memory.

@@ -1,0 +1,7 @@
+joint_state_publisher_gui:
+  ros__parameters:
+    use_sim_time: false
+    zeros:
+      polar_align_joint: 0.584913
+      ra_joint: 0.0
+      dec_joint: 1.570795

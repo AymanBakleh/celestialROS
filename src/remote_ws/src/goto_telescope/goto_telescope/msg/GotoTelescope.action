@@ -1,0 +1,13 @@
+# Goal
+float64 target_ra       # Target Right Ascension in hours
+float64 target_dec      # Target Declination in degrees
+---
+# Result
+bool success
+float64 final_ra
+float64 final_dec
+---
+# Feedback
+float64 current_ra
+float64 current_dec
+float64 progress        # 0.0 to 1.0
